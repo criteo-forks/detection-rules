@@ -451,3 +451,71 @@ def delete_job(ctx: click.Context, job_name, job_type, verbose=True):
 
     if verbose:
         click.echo(f'Deleted {job_type} job: {job_name}')
+
+@ml_group.command('open-job')
+@click.argument('job-name')
+@click.pass_context
+def start_datadeed(ctx: click.Context, job_name, verbose=True):
+    """Open experimental ML jobs."""
+    es_client: Elasticsearch = ctx.obj['es']
+    ml_client = MlClient(es_client)
+
+    try:
+        ml_client.open_job(job_id=job_name)
+
+    except (elasticsearch.NotFoundError, elasticsearch.ConflictError) as e:
+        client_error(str(e), e, ctx=ctx)
+
+    if verbose:
+        click.echo(f'Opened job {job_name}')
+
+@ml_group.command('close-job')
+@click.argument('job-name')
+@click.pass_context
+def stop_datadeed(ctx: click.Context, job_name, verbose=True):
+    """Close experimental ML jobs."""
+    es_client: Elasticsearch = ctx.obj['es']
+    ml_client = MlClient(es_client)
+
+    try:
+        ml_client.close_job(job_id=job_name)
+
+    except (elasticsearch.NotFoundError) as e:
+        client_error(str(e), e, ctx=ctx)
+
+    if verbose:
+        click.echo(f'Closed job {job_name}')
+
+@ml_group.command('start-datafeed')
+@click.argument('datafeed-id')
+@click.pass_context
+def start_datadeed(ctx: click.Context, datafeed_id, verbose=True):
+    """Start experimental ML datafeeds."""
+    es_client: Elasticsearch = ctx.obj['es']
+    ml_client = MlClient(es_client)
+
+    try:
+        ml_client.start_datafeed(datafeed_id=datafeed_id)
+
+    except (elasticsearch.NotFoundError, elasticsearch.ConflictError) as e:
+        client_error(str(e), e, ctx=ctx)
+
+    if verbose:
+        click.echo(f'Started datafeed {datafeed_id}')
+
+@ml_group.command('stop-datafeed')
+@click.argument('datafeed-id')
+@click.pass_context
+def stop_datadeed(ctx: click.Context, datafeed_id, verbose=True):
+    """Stop experimental ML datafeeds."""
+    es_client: Elasticsearch = ctx.obj['es']
+    ml_client = MlClient(es_client)
+
+    try:
+        ml_client.stop_datafeed(datafeed_id=datafeed_id)
+
+    except (elasticsearch.NotFoundError) as e:
+        client_error(str(e), e, ctx=ctx)
+
+    if verbose:
+        click.echo(f'Stopped datafeed {datafeed_id}')
