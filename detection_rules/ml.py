@@ -383,6 +383,21 @@ def setup_bundle(ctx, model_tag, repo, model_dir):
     click.echo('To upload ML jobs, run: es experimental upload-ml-job <ml-job.json>')
 
 
+@ml_group.command('get-job')
+@click.argument('job-name')
+@click.pass_context
+def get_job(ctx: click.Context, job_name, verbose=True):
+    """Remove experimental ML jobs."""
+    es_client: Elasticsearch = ctx.obj['es']
+    ml_client = MlClient(es_client)
+
+    try:
+       jobs =  ml_client.get_jobs(job_id=job_name)
+    except (elasticsearch.NotFoundError, elasticsearch.ConflictError) as e:
+        client_error(str(e), e, ctx=ctx)
+    click.echo(jobs)
+    return jobs
+
 @ml_group.command('upload-job')
 @click.argument('job-file', type=click.Path(exists=True, dir_okay=False))
 @click.option('--overwrite', '-o', is_flag=True, help='Overwrite job if exists by name')
